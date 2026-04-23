@@ -1,24 +1,32 @@
 import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, OCRError } from '../types';
 
-let paddleOCR: any = null;
+// PaddleOCR returns an array of detected lines: each line is [text, confidence]
+type PaddleOCRLine = [string, number];
+
+interface PaddleOCRInstance {
+  ocr(imageDataUrl: string): Promise<PaddleOCRLine[]>;
+}
+
+let paddleOCR: PaddleOCRInstance | null = null;
 
 export async function initializePaddleOCR(): Promise<void> {
   if (paddleOCR) return;
 
   try {
+    // paddleocr has no published TS types; the module is resolved at runtime
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore — paddleocr types not available; installed at runtime
+    // @ts-ignore
     const { PaddleOCR } = await import('paddleocr');
     paddleOCR = new PaddleOCR({
       ocr_version: 'pp-ocr-server',
       enable_mkldnn: true,
       use_angle_cls: true,
       lang: 'en',
-    });
+    }) as PaddleOCRInstance;
   } catch (error) {
     console.error('Failed to initialize PaddleOCR:', error);
-    throw new Error('OCR initialization failed');
+    throw new Error('OCR initialization failed', { cause: error });
   }
 }
 
@@ -27,7 +35,7 @@ export async function runClientSideOCR(image: File): Promise<OCRExtraction> {
     throw {
       code: 'ocr-failed',
       message: 'OCR not initialized. Please reload the app.',
-    } as OCRError;
+    } satisfies OCRError;
   }
 
   try {
@@ -36,7 +44,7 @@ export async function runClientSideOCR(image: File): Promise<OCRExtraction> {
       throw {
         code: 'file-too-large',
         message: 'Image is too large. Please use a smaller file.',
-      } as OCRError;
+      } satisfies OCRError;
     }
 
     const validFormats = ['image/jpeg', 'image/png', 'application/pdf'];
@@ -44,7 +52,7 @@ export async function runClientSideOCR(image: File): Promise<OCRExtraction> {
       throw {
         code: 'format-unsupported',
         message: 'Please upload JPG, PNG, or PDF.',
-      } as OCRError;
+      } satisfies OCRError;
     }
 
     const imageDataUrl = await fileToDataUrl(image);
@@ -59,7 +67,7 @@ export async function runClientSideOCR(image: File): Promise<OCRExtraction> {
     throw {
       code: 'ocr-failed',
       message: 'Could not extract text. Try another image.',
-    } as OCRError;
+    } satisfies OCRError;
   }
 }
 
@@ -72,8 +80,6 @@ function fileToDataUrl(file: File): Promise<string> {
   });
 }
 
-function flattenOCRResult(result: any[][]): string {
-  return result
-    .map((item: any[]) => item[0] as string)
-    .join('\n');
+function flattenOCRResult(lines: PaddleOCRLine[]): string {
+  return lines.map(([text]) => text).join('\n');
 }
