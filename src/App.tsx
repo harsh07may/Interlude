@@ -11,17 +11,12 @@ function App() {
   const ocrConfig = useOCRConfig();
   const [showDigitizeModal, setShowDigitizeModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [ocrInitFailed, setOcrInitFailed] = useState(false);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        await initializePaddleOCR();
-      } catch (error) {
-        console.warn('PaddleOCR initialization failed. Client-side OCR unavailable.', error);
-      }
-    };
-
-    init();
+    initializePaddleOCR().catch(() => {
+      setOcrInitFailed(true);
+    });
   }, []);
 
   const handleSettingsSave = (newConfig: OCRConfig) => {
@@ -39,6 +34,7 @@ function App() {
       <DigitizeModal
         isOpen={showDigitizeModal}
         ocrConfig={ocrConfig.config}
+        ocrInitFailed={ocrInitFailed}
         onClose={() => setShowDigitizeModal(false)}
       />
 

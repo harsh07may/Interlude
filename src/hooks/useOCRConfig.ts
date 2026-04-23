@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { OCRConfig } from '../types';
 
 const STORAGE_KEY = 'journal-digitizer-ocr-config';
@@ -7,22 +7,19 @@ const DEFAULT_CONFIG: OCRConfig = {
   method: 'client-side',
 };
 
-export function useOCRConfig() {
-  const [config, setConfigState] = useState<OCRConfig>(DEFAULT_CONFIG);
-  const [isLoaded, setIsLoaded] = useState(false);
+function loadStoredConfig(): OCRConfig {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) return JSON.parse(stored) as OCRConfig;
+  } catch {
+    // corrupted storage — fall back to default
+  }
+  return DEFAULT_CONFIG;
+}
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setConfigState(parsed);
-      }
-    } catch (error) {
-      console.error('Failed to load OCR config from localStorage:', error);
-    }
-    setIsLoaded(true);
-  }, []);
+export function useOCRConfig() {
+  // Lazy initializer: reads localStorage once on mount, no re-render needed
+  const [config, setConfigState] = useState<OCRConfig>(loadStoredConfig);
 
   const setConfig = (newConfig: OCRConfig) => {
     setConfigState(newConfig);
@@ -33,14 +30,7 @@ export function useOCRConfig() {
     }
   };
 
-  const resetConfig = () => {
-    setConfig(DEFAULT_CONFIG);
-  };
+  const resetConfig = () => setConfig(DEFAULT_CONFIG);
 
-  return {
-    config,
-    setConfig,
-    resetConfig,
-    isLoaded,
-  };
+  return { config, setConfig, resetConfig };
 }

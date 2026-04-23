@@ -6,37 +6,39 @@ export function useImageUpload() {
   const [image, setImageState] = useState<File | null>(null);
   const [preview, setPreview] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<OCRError | null>(null);
 
-  const handleImageUpload = async (file: File) => {
+  // Returns the error directly so callers don't read stale React state after await
+  const handleImageUpload = async (file: File): Promise<OCRError | null> => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const validation = validateImageFile(file);
       if (!validation.valid) {
-        throw {
+        setImageState(null);
+        setPreview('');
+        return {
           code: 'format-unsupported',
-          message: validation.error || 'Invalid file',
-        } as OCRError;
+          message: validation.error ?? 'Invalid file',
+        } satisfies OCRError;
       }
 
-      const reader = new FileReader();
-      const previewPromise = new Promise<string>((resolve, reject) => {
+      const previewDataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
 
-      const previewDataUrl = await previewPromise;
-
       setImageState(file);
       setPreview(previewDataUrl);
-    } catch (err) {
-      const error = err as OCRError;
-      setError(error);
+      return null;
+    } catch {
       setImageState(null);
       setPreview('');
+      return {
+        code: 'ocr-failed',
+        message: 'Failed to read image file.',
+      } satisfies OCRError;
     } finally {
       setIsLoading(false);
     }
@@ -45,22 +47,12 @@ export function useImageUpload() {
   const setImage = (file: File, dataUrl: string) => {
     setImageState(file);
     setPreview(dataUrl);
-    setError(null);
   };
 
   const clearImage = () => {
     setImageState(null);
     setPreview('');
-    setError(null);
   };
 
-  return {
-    image,
-    preview,
-    isLoading,
-    error,
-    handleImageUpload,
-    setImage,
-    clearImage,
-  };
+  return { image, preview, isLoading, handleImageUpload, setImage, clearImage };
 }

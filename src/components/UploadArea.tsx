@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import { useRef, useMemo, useState } from 'react';
+import type { DragEvent } from 'react';
 import { isMobileDevice } from '../lib/utils';
 
 interface UploadAreaProps {
@@ -9,35 +10,31 @@ interface UploadAreaProps {
 export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const [isDragActive, setIsDragActive] = React.useState(false);
+  const [isDragActive, setIsDragActive] = useState(false);
+  const isMobile = useMemo(() => isMobileDevice(), []);
 
   const handleFileChange = async (file: File | null) => {
-    if (file) {
-      await onImageSelected(file);
-    }
+    if (file) await onImageSelected(file);
   };
 
-  const handleDragEnter = (e: React.DragEvent) => {
+  const handleDragEnter = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragActive(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent) => {
+  const handleDragLeave = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragActive(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e: DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragActive(false);
-
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
-      handleFileChange(files[0]);
-    }
+    if (files.length > 0) handleFileChange(files[0]);
   };
 
   return (
@@ -61,7 +58,7 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
             <p className="upload-subtitle">Drag and drop your image here</p>
 
             <div className="upload-actions">
-              {isMobileDevice() && (
+              {isMobile && (
                 <button
                   onClick={() => cameraInputRef.current?.click()}
                   className="btn btn-primary"
@@ -69,7 +66,6 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
                   📱 Take Photo
                 </button>
               )}
-
               <button onClick={() => fileInputRef.current?.click()} className="btn btn-primary">
                 📁 Choose File
               </button>
@@ -85,17 +81,17 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
         type="file"
         accept="image/jpeg,image/png,application/pdf"
         style={{ display: 'none' }}
-        onChange={e => handleFileChange(e.target.files?.[0] || null)}
+        onChange={e => handleFileChange(e.target.files?.[0] ?? null)}
       />
 
-      {isMobileDevice() && (
+      {isMobile && (
         <input
           ref={cameraInputRef}
           type="file"
           accept="image/*"
           capture="environment"
           style={{ display: 'none' }}
-          onChange={e => handleFileChange(e.target.files?.[0] || null)}
+          onChange={e => handleFileChange(e.target.files?.[0] ?? null)}
         />
       )}
     </div>

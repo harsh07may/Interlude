@@ -24,15 +24,13 @@ export function ResultsDisplay({ extraction, onScanAnother, onDone }: ResultsDis
   return (
     <div className="results-container">
       <div className="results-header">
-        {extraction.date && (
-          <h3 className="results-date">{extraction.date}</h3>
-        )}
+        {extraction.date && <h3 className="results-date">{extraction.date}</h3>}
       </div>
 
       <div className="results-entries">
         {extraction.entries.length > 0 ? (
           extraction.entries.map((entry, idx) => (
-            <div key={idx} className="journal-entry">
+            <div key={`${entry.timestamp}-${idx}`} className="journal-entry">
               <div className="entry-timestamp">{entry.timestamp}</div>
               <div className="entry-divider"></div>
               <div className="entry-text">{entry.text}</div>
@@ -50,11 +48,9 @@ export function ResultsDisplay({ extraction, onScanAnother, onDone }: ResultsDis
         >
           {copyFeedback ? '✓ Copied!' : 'Copy Results'}
         </button>
-
         <button onClick={onScanAnother} className="btn btn-secondary">
           Scan Another Page
         </button>
-
         <button onClick={onDone} className="btn btn-secondary">
           Done
         </button>

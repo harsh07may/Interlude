@@ -9,43 +9,53 @@ import { ResultsDisplay } from './ResultsDisplay';
 interface DigitizeModalProps {
   isOpen: boolean;
   ocrConfig: OCRConfig;
+  ocrInitFailed: boolean;
   onClose: () => void;
 }
 
 type ModalStep = 'upload' | 'results' | 'error';
 
-export function DigitizeModal({ isOpen, ocrConfig, onClose }: DigitizeModalProps) {
+export function DigitizeModal({ isOpen, ocrConfig, ocrInitFailed, onClose }: DigitizeModalProps) {
   const [step, setStep] = useState<ModalStep>('upload');
   const [extraction, setExtraction] = useState<OCRExtraction | null>(null);
   const [error, setError] = useState<OCRError | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const imageUpload = useImageUpload();
 
   const handleImageSelected = async (file: File) => {
     setError(null);
 
+    // handleImageUpload returns the error directly — avoids reading stale React state after await
+    const uploadError = await imageUpload.handleImageUpload(file);
+    if (uploadError) {
+      setError(uploadError);
+      setStep('error');
+      return;
+    }
+
+    if (ocrConfig.method === 'client-side' && ocrInitFailed) {
+      setError({
+        code: 'ocr-failed',
+        message: 'Client-side OCR failed to initialise. Switch to Backend API in Settings.',
+      });
+      setStep('error');
+      return;
+    }
+
+    setIsProcessing(true);
     try {
-      await imageUpload.handleImageUpload(file);
-
-      if (imageUpload.error) {
-        setError(imageUpload.error);
-        setStep('error');
-        return;
-      }
-
-      let result: OCRExtraction;
-
-      if (ocrConfig.method === 'backend-api' && ocrConfig.backendUrl) {
-        result = await runBackendOCR(file, ocrConfig.backendUrl);
-      } else {
-        result = await runClientSideOCR(file);
-      }
+      const result =
+        ocrConfig.method === 'backend-api' && ocrConfig.backendUrl
+          ? await runBackendOCR(file, ocrConfig.backendUrl)
+          : await runClientSideOCR(file);
 
       setExtraction(result);
       setStep('results');
     } catch (err) {
-      const ocrError = err as OCRError;
-      setError(ocrError);
+      setError(err as OCRError);
       setStep('error');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -64,18 +74,29 @@ export function DigitizeModal({ isOpen, ocrConfig, onClose }: DigitizeModalProps
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div
+      className="modal-overlay"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="digitize-title"
+    >
       <div className="modal-content digitize-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose}>
+        <button className="modal-close" onClick={onClose} aria-label="Close">
           ✕
         </button>
 
         {step === 'upload' && (
           <>
-            <h2>Digitize Journal Page</h2>
+            <h2 id="digitize-title">Digitize Journal Page</h2>
+            {ocrInitFailed && ocrConfig.method === 'client-side' && (
+              <p className="status-error" style={{ marginBottom: '1rem' }}>
+                ⚠ Client-side OCR unavailable. Configure a Backend API in Settings.
+              </p>
+            )}
             <UploadArea
               onImageSelected={handleImageSelected}
-              isLoading={imageUpload.isLoading}
+              isLoading={imageUpload.isLoading || isProcessing}
             />
           </>
         )}
