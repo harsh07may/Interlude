@@ -2,7 +2,7 @@ import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, OCRError } from '../types';
 
 const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 const PROMPT = `Transcribe all text from this handwritten journal page.
 Output format — one entry per line:
@@ -43,7 +43,13 @@ export async function runGeminiOCR(image: File, apiKey: string): Promise<OCRExtr
     if (response.status === 400 || response.status === 403) {
       throw {
         code: 'ocr-failed',
-        message: `Invalid Gemini API key. Check your Settings.`,
+        message: 'Invalid Gemini API key. Check your Settings.',
+      } satisfies OCRError;
+    }
+    if (response.status === 429) {
+      throw {
+        code: 'ocr-failed',
+        message: 'Gemini rate limit hit. Wait a minute and try again.',
       } satisfies OCRError;
     }
     throw {
