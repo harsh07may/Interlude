@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useOCRConfig } from './hooks/useOCRConfig';
-import { initializePaddleOCR } from './lib/paddleocr';
 import { Dashboard } from './components/Dashboard';
 import { DigitizeModal } from './components/DigitizeModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -11,13 +10,6 @@ function App() {
   const ocrConfig = useOCRConfig();
   const [showDigitizeModal, setShowDigitizeModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [ocrInitFailed, setOcrInitFailed] = useState(false);
-
-  useEffect(() => {
-    initializePaddleOCR().catch(() => {
-      setOcrInitFailed(true);
-    });
-  }, []);
 
   const handleSettingsSave = (newConfig: OCRConfig) => {
     ocrConfig.setConfig(newConfig);
@@ -34,7 +26,6 @@ function App() {
       <DigitizeModal
         isOpen={showDigitizeModal}
         ocrConfig={ocrConfig.config}
-        ocrInitFailed={ocrInitFailed}
         onClose={() => setShowDigitizeModal(false)}
       />
 

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { OCRExtraction, OCRError, OCRConfig } from '../types';
 import { useImageUpload } from '../hooks/useImageUpload';
-import { runClientSideOCR } from '../lib/paddleocr';
+import { runClientSideOCR } from '../lib/ocr';
 import { runBackendOCR } from '../lib/backendOcr';
 import { UploadArea } from './UploadArea';
 import { ResultsDisplay } from './ResultsDisplay';
@@ -9,13 +9,12 @@ import { ResultsDisplay } from './ResultsDisplay';
 interface DigitizeModalProps {
   isOpen: boolean;
   ocrConfig: OCRConfig;
-  ocrInitFailed: boolean;
   onClose: () => void;
 }
 
 type ModalStep = 'upload' | 'results' | 'error';
 
-export function DigitizeModal({ isOpen, ocrConfig, ocrInitFailed, onClose }: DigitizeModalProps) {
+export function DigitizeModal({ isOpen, ocrConfig, onClose }: DigitizeModalProps) {
   const [step, setStep] = useState<ModalStep>('upload');
   const [extraction, setExtraction] = useState<OCRExtraction | null>(null);
   const [error, setError] = useState<OCRError | null>(null);
@@ -25,19 +24,9 @@ export function DigitizeModal({ isOpen, ocrConfig, ocrInitFailed, onClose }: Dig
   const handleImageSelected = async (file: File) => {
     setError(null);
 
-    // handleImageUpload returns the error directly — avoids reading stale React state after await
     const uploadError = await imageUpload.handleImageUpload(file);
     if (uploadError) {
       setError(uploadError);
-      setStep('error');
-      return;
-    }
-
-    if (ocrConfig.method === 'client-side' && ocrInitFailed) {
-      setError({
-        code: 'ocr-failed',
-        message: 'Client-side OCR failed to initialise. Switch to Backend API in Settings.',
-      });
       setStep('error');
       return;
     }
@@ -89,11 +78,6 @@ export function DigitizeModal({ isOpen, ocrConfig, ocrInitFailed, onClose }: Dig
         {step === 'upload' && (
           <>
             <h2 id="digitize-title">Digitize Journal Page</h2>
-            {ocrInitFailed && ocrConfig.method === 'client-side' && (
-              <p className="status-error" style={{ marginBottom: '1rem' }}>
-                ⚠ Client-side OCR unavailable. Configure a Backend API in Settings.
-              </p>
-            )}
             <UploadArea
               onImageSelected={handleImageSelected}
               isLoading={imageUpload.isLoading || isProcessing}
