@@ -1,6 +1,8 @@
 import { useRef, useMemo, useState } from 'react';
 import type { DragEvent } from 'react';
 import { isMobileDevice } from '../lib/utils';
+import { ACCEPTED_MIME_TYPES } from '../constants';
+import { CameraIcon, FolderIcon, UploadIcon } from './icons';
 
 interface UploadAreaProps {
   onImageSelected: (file: File) => Promise<void>;
@@ -36,6 +38,9 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
     const files = e.dataTransfer.files;
     if (files.length > 0) handleFileChange(files[0]);
   };
+
+  // Derive the accept string from the shared ACCEPTED_MIME_TYPES constant.
+  const acceptAttr = ACCEPTED_MIME_TYPES.join(',');
 
   return (
     <div className="upload-area-container">
@@ -84,7 +89,7 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/jpeg,image/png,application/pdf"
+        accept={acceptAttr}
         style={{ display: 'none' }}
         onChange={e => handleFileChange(e.target.files?.[0] ?? null)}
       />
@@ -100,32 +105,5 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
         />
       )}
     </div>
-  );
-}
-
-function UploadIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 16V4" />
-      <path d="m7 9 5-5 5 5" />
-      <path d="M5 20h14" />
-    </svg>
-  );
-}
-
-function CameraIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3Z" />
-      <path d="M12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
-    </svg>
-  );
-}
-
-function FolderIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
-    </svg>
   );
 }

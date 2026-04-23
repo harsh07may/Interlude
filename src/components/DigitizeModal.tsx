@@ -5,6 +5,7 @@ import { runBackendOCR } from '../lib/backendOcr';
 import { getUploadError } from '../lib/utils';
 import { UploadArea } from './UploadArea';
 import { ResultsDisplay } from './ResultsDisplay';
+import { AlertIcon, CloseIcon } from './icons';
 
 interface DigitizeModalProps {
   isOpen: boolean;
@@ -48,6 +49,7 @@ export function DigitizeModal({ isOpen, ocrConfig, onSaveScan, onClose }: Digiti
     }
   };
 
+  // Resets all transient state so the modal is clean for the next scan.
   const handleScanAnother = () => {
     setExtraction(null);
     setError(null);
@@ -107,24 +109,5 @@ export function DigitizeModal({ isOpen, ocrConfig, onSaveScan, onClose }: Digiti
         )}
       </div>
     </div>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  );
-}
-
-function AlertIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 9v4" />
-      <path d="M12 17h.01" />
-      <path d="m10.3 4.1-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-2.9l-8-14a2 2 0 0 0-3.4 0Z" />
-    </svg>
   );
 }

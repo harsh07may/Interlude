@@ -5,13 +5,16 @@ import { Dashboard } from './components/Dashboard';
 import { DigitizeModal } from './components/DigitizeModal';
 import { LibraryPage } from './components/LibraryPage';
 import { SettingsModal } from './components/SettingsModal';
-import type { OCRConfig } from './types';
+import type { OCRConfig, OCRExtraction } from './types';
+import { ROUTE_HOME, ROUTE_LIBRARY } from './constants';
 import './App.css';
 
-type Route = '/' | '/library';
+type Route = typeof ROUTE_HOME | typeof ROUTE_LIBRARY;
 
+// Called both as a lazy initializer (useState(getRoute)) and inside the
+// popstate listener (setRoute(getRoute())). Both paths are intentional.
 function getRoute(): Route {
-  return window.location.pathname === '/library' ? '/library' : '/';
+  return window.location.pathname === ROUTE_LIBRARY ? ROUTE_LIBRARY : ROUTE_HOME;
 }
 
 function App() {
@@ -39,18 +42,18 @@ function App() {
     setShowSettingsModal(false);
   };
 
-  const handleSaveScan = (...args: Parameters<typeof scannedPages.addPage>) => {
-    scannedPages.addPage(...args);
+  const handleSaveScan = (extraction: OCRExtraction, title: string, tags: string[]) => {
+    scannedPages.addPage(extraction, title, tags);
     setShowDigitizeModal(false);
-    navigate('/library');
+    navigate(ROUTE_LIBRARY);
   };
 
   return (
     <div className="app">
-      {route === '/library' ? (
+      {route === ROUTE_LIBRARY ? (
         <LibraryPage
           pages={scannedPages.pages}
-          onBackHome={() => navigate('/')}
+          onBackHome={() => navigate(ROUTE_HOME)}
           onDigitizeClick={() => setShowDigitizeModal(true)}
           onSettingsClick={() => setShowSettingsModal(true)}
           onUpdatePage={scannedPages.updatePage}
@@ -59,7 +62,7 @@ function App() {
       ) : (
         <Dashboard
           onDigitizeClick={() => setShowDigitizeModal(true)}
-          onLibraryClick={() => navigate('/library')}
+          onLibraryClick={() => navigate(ROUTE_LIBRARY)}
           onSettingsClick={() => setShowSettingsModal(true)}
         />
       )}

@@ -1,16 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { OCRExtraction, ScannedPage } from '../types';
-
-const STORAGE_KEY = 'journal-digitizer-scanned-pages';
-
-function createId() {
-  return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
+import { createId } from '../lib/utils';
+import { DEFAULT_PAGE_TITLE, STORAGE_KEY_PAGES } from '../constants';
 
 function normalizePage(page: ScannedPage): ScannedPage {
   return {
     ...page,
-    title: page.title.trim() || page.extraction.date || 'Untitled page',
+    title: page.title.trim() || page.extraction.date || DEFAULT_PAGE_TITLE,
     tags: page.tags.map(tag => tag.trim()).filter(Boolean),
     extraction: {
       ...page.extraction,
@@ -24,7 +20,7 @@ function normalizePage(page: ScannedPage): ScannedPage {
 
 function loadStoredPages(): ScannedPage[] {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEY_PAGES);
     if (!stored) return [];
     const pages = JSON.parse(stored) as ScannedPage[];
     return pages.map(normalizePage);
@@ -34,7 +30,7 @@ function loadStoredPages(): ScannedPage[] {
 }
 
 function saveStoredPages(pages: ScannedPage[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(pages));
+  localStorage.setItem(STORAGE_KEY_PAGES, JSON.stringify(pages));
 }
 
 export function useScannedPages() {
@@ -54,7 +50,7 @@ export function useScannedPages() {
     const now = new Date().toISOString();
     const page = normalizePage({
       id: createId(),
-      title: title ?? extraction.date ?? 'Untitled page',
+      title: title ?? extraction.date ?? DEFAULT_PAGE_TITLE,
       tags,
       extraction,
       createdAt: now,
@@ -62,10 +58,12 @@ export function useScannedPages() {
     });
 
     persist([page, ...pages]);
-    return page;
   };
 
-  const updatePage = (pageId: string, updates: Pick<ScannedPage, 'title' | 'tags' | 'extraction'>) => {
+  const updatePage = (
+    pageId: string,
+    updates: Pick<ScannedPage, 'title' | 'tags' | 'extraction'>
+  ) => {
     const now = new Date().toISOString();
     persist(
       pages.map(page =>

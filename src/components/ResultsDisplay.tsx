@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import type { JournalEntry, OCRExtraction } from '../types';
 import { copyExtractionToClipboard } from '../lib/utils';
+import { createId } from '../lib/utils';
+import { COPY_FEEDBACK_MS, DEFAULT_PAGE_TITLE } from '../constants';
+import {
+  CheckIcon,
+  CopyIcon,
+  EditIcon,
+  PlusIcon,
+  SaveIcon,
+  ScanIcon,
+  TrashIcon,
+} from './icons';
 
 interface ResultsDisplayProps {
   extraction: OCRExtraction;
@@ -12,14 +23,10 @@ interface ResultsDisplayProps {
   onSave?: (extraction: OCRExtraction, title: string, tags: string[]) => void;
 }
 
-function createEntryId() {
-  return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-}
-
 function withEntryIds(extraction: OCRExtraction): OCRExtraction {
   return {
     ...extraction,
-    entries: extraction.entries.map(entry => ({ ...entry, id: entry.id ?? createEntryId() })),
+    entries: extraction.entries.map(entry => ({ ...entry, id: entry.id ?? createId() })),
   };
 }
 
@@ -35,14 +42,14 @@ export function ResultsDisplay({
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [draftExtraction, setDraftExtraction] = useState(() => withEntryIds(extraction));
-  const [title, setTitle] = useState(initialTitle ?? extraction.date ?? 'Untitled page');
+  const [title, setTitle] = useState(initialTitle ?? extraction.date ?? DEFAULT_PAGE_TITLE);
   const [tags, setTags] = useState(initialTags.join(', '));
 
   const handleCopy = async () => {
     try {
       await copyExtractionToClipboard(draftExtraction);
       setCopyFeedback(true);
-      setTimeout(() => setCopyFeedback(false), 2000);
+      setTimeout(() => setCopyFeedback(false), COPY_FEEDBACK_MS);
     } catch (error) {
       console.error('Failed to copy:', error);
     }
@@ -60,7 +67,7 @@ export function ResultsDisplay({
   const addEntry = () => {
     setDraftExtraction(current => ({
       ...current,
-      entries: [...current.entries, { id: createEntryId(), timestamp: '', text: '' }],
+      entries: [...current.entries, { id: createId(), timestamp: '', text: '' }],
     }));
     setIsEditing(true);
   };
@@ -78,7 +85,7 @@ export function ResultsDisplay({
     .filter(Boolean);
 
   const handleSave = () => {
-    onSave?.(draftExtraction, title.trim() || draftExtraction.date || 'Untitled page', parsedTags);
+    onSave?.(draftExtraction, title.trim() || draftExtraction.date || DEFAULT_PAGE_TITLE, parsedTags);
     setIsEditing(false);
   };
 
@@ -196,72 +203,5 @@ export function ResultsDisplay({
         </button>
       </div>
     </div>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  );
-}
-
-function SaveIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" />
-      <path d="M17 21v-8H7v8" />
-      <path d="M7 3v5h8" />
-    </svg>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 5v14" />
-      <path d="M5 12h14" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M3 6h18" />
-      <path d="M8 6V4h8v2" />
-      <path d="M19 6 18 20H6L5 6" />
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8 8h11v11H8z" />
-      <path d="M5 16H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="m20 6-11 11-5-5" />
-    </svg>
-  );
-}
-
-function ScanIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M7 3H5a2 2 0 0 0-2 2v2" />
-      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
-      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
-      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
-      <path d="M7 12h10" />
-    </svg>
   );
 }

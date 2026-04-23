@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import type { OCRConfig } from '../types';
 import { testBackendConnection } from '../lib/backendOcr';
-import { GEMINI_DEFAULT_MODEL } from '../lib/geminiOcr';
+import { GEMINI_DEFAULT_MODEL } from '../constants';
+import { CloseIcon } from './icons';
 
 interface SettingsModalProps {
   config: OCRConfig;
@@ -157,14 +158,5 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
         </div>
       </div>
     </div>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
   );
 }

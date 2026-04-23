@@ -1,9 +1,6 @@
 import { useState } from 'react';
 import type { OCRConfig } from '../types';
-import { GEMINI_DEFAULT_MODEL } from '../lib/geminiOcr';
-
-const STORAGE_KEY = 'journal-digitizer-ocr-config';
-const QUOTA_BLOCKED_DEFAULT_MODELS = new Set(['gemini-3.1-pro', 'gemini-3.1-pro-preview']);
+import { GEMINI_DEFAULT_MODEL, QUOTA_BLOCKED_MODELS, STORAGE_KEY_OCR_CONFIG } from '../constants';
 
 const DEFAULT_CONFIG: OCRConfig = {
   method: 'gemini',
@@ -12,10 +9,10 @@ const DEFAULT_CONFIG: OCRConfig = {
 
 function loadStoredConfig(): OCRConfig {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEY_OCR_CONFIG);
     if (stored) return normalizeConfig(JSON.parse(stored) as OCRConfig);
   } catch {
-    // corrupted storage — fall back to default
+    // Corrupted storage — fall back to default.
   }
   return DEFAULT_CONFIG;
 }
@@ -24,7 +21,7 @@ function normalizeConfig(config: OCRConfig): OCRConfig {
   if (config.method !== 'gemini') return config;
 
   const geminiModel = config.geminiModel?.trim();
-  if (!geminiModel || QUOTA_BLOCKED_DEFAULT_MODELS.has(geminiModel)) {
+  if (!geminiModel || QUOTA_BLOCKED_MODELS.has(geminiModel)) {
     return { ...config, geminiModel: GEMINI_DEFAULT_MODEL };
   }
 
@@ -37,7 +34,7 @@ export function useOCRConfig() {
   const setConfig = (newConfig: OCRConfig) => {
     setConfigState(newConfig);
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(newConfig));
+      localStorage.setItem(STORAGE_KEY_OCR_CONFIG, JSON.stringify(newConfig));
     } catch (error) {
       console.error('Failed to save OCR config to localStorage:', error);
     }

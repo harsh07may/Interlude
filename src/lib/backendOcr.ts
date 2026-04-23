@@ -1,29 +1,15 @@
 import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, BackendOCRResponse, OCRError } from '../types';
-import { getUploadError } from './utils';
+import { getUploadError, isValidBackendUrl } from './utils';
 
-export async function runBackendOCR(
-  image: File,
-  backendUrl: string
-): Promise<OCRExtraction> {
+export async function runBackendOCR(image: File, backendUrl: string): Promise<OCRExtraction> {
   try {
-    if (!backendUrl || !backendUrl.trim()) {
+    if (!isValidBackendUrl(backendUrl)) {
       throw {
         code: 'backend-unreachable',
-        message: 'Backend URL not configured. Check your settings.',
-      } satisfies OCRError;
-    }
-
-    // Reject non-http(s) URLs before they reach fetch
-    try {
-      const parsed = new URL(backendUrl);
-      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-        throw new Error('invalid protocol');
-      }
-    } catch {
-      throw {
-        code: 'backend-unreachable',
-        message: 'Invalid backend URL. Must start with http:// or https://',
+        message: backendUrl.trim()
+          ? 'Invalid backend URL. Must start with http:// or https://'
+          : 'Backend URL not configured. Check your settings.',
       } satisfies OCRError;
     }
 
@@ -56,12 +42,8 @@ export async function runBackendOCR(
 }
 
 export async function testBackendConnection(backendUrl: string): Promise<boolean> {
+  if (!isValidBackendUrl(backendUrl)) return false;
   try {
-    if (!backendUrl || !backendUrl.trim()) return false;
-
-    const parsed = new URL(backendUrl);
-    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
-
     const response = await fetch(backendUrl, { method: 'OPTIONS' });
     return response.ok || response.status === 405;
   } catch {

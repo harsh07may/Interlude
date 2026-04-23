@@ -1,4 +1,5 @@
 import type { JournalEntry, OCRExtraction } from '../types';
+import { DEFAULT_OCR_CONFIDENCE } from '../constants';
 
 const ENTRY_LINE_RE = /^(\d{1,2}:\d{2})\s*(?:[|]\s*)?[-–]\s*(.+)$/;
 const TIMESTAMP_ONLY_RE = /^(\d{1,2}:\d{2})\s*[|]?$/;
@@ -28,7 +29,7 @@ export function parseOCROutput(rawText: string): OCRExtraction {
     }
   }
 
-  return { date, entries, rawText, confidence: 0.85 };
+  return { date, entries, rawText, confidence: DEFAULT_OCR_CONFIDENCE };
 }
 
 export function formatExtractionAsText(extraction: OCRExtraction): string {

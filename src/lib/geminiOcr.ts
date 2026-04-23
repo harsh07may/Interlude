@@ -1,8 +1,8 @@
 import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, OCRError } from '../types';
+import { GEMINI_API_BASE_URL, GEMINI_DEFAULT_MODEL } from '../constants';
 
-const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/models';
-export const GEMINI_DEFAULT_MODEL = 'gemini-2.5-flash';
+export { GEMINI_DEFAULT_MODEL };
 
 const PROMPT = `Transcribe all text from this handwritten journal page.
 Output format — one entry per line:
@@ -33,7 +33,7 @@ export async function runGeminiOCR(
   }
 
   const base64 = await fileToBase64(image);
-  const url = `${GEMINI_BASE}/${encodeURIComponent(trimmedModel)}:generateContent`;
+  const url = `${GEMINI_API_BASE_URL}/${encodeURIComponent(trimmedModel)}:generateContent`;
 
   let response: Response;
   try {
@@ -132,7 +132,11 @@ function extractGeminiText(data: unknown): string {
 function isGeminiResponse(data: unknown): data is {
   candidates: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
 } {
-  return typeof data === 'object' && data !== null && Array.isArray((data as { candidates?: unknown }).candidates);
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    Array.isArray((data as { candidates?: unknown }).candidates)
+  );
 }
 
 function fileToBase64(file: File): Promise<string> {
