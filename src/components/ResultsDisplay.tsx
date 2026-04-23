@@ -5,6 +5,7 @@ import { createId } from '../lib/utils';
 import { COPY_FEEDBACK_MS, DEFAULT_PAGE_TITLE } from '../constants';
 import {
   CheckIcon,
+  CloseIcon,
   CopyIcon,
   EditIcon,
   PlusIcon,
@@ -106,10 +107,19 @@ export function ResultsDisplay({
           )}
           {draftExtraction.date && <p className="results-date">{draftExtraction.date}</p>}
         </div>
-        <button onClick={() => setIsEditing(!isEditing)} className="btn btn-secondary">
-          <EditIcon />
-          {isEditing ? 'Preview' : 'Edit'}
-        </button>
+        <div className="results-header-actions">
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="icon-button"
+            title={isEditing ? 'Preview' : 'Edit'}
+            aria-label={isEditing ? 'Preview entries' : 'Edit entries'}
+          >
+            <EditIcon />
+          </button>
+          <button onClick={onDone} className="icon-button" aria-label="Close">
+            <CloseIcon />
+          </button>
+        </div>
       </div>
 
       {isEditing && (
@@ -174,32 +184,32 @@ export function ResultsDisplay({
         )}
       </div>
 
-      <div className="results-actions">
-        {isEditing && (
-          <button onClick={addEntry} className="btn btn-secondary">
-            <PlusIcon />
-            Add Entry
-          </button>
-        )}
-        {onSave && (
-          <button onClick={handleSave} className="btn btn-primary">
-            <SaveIcon />
-            {saveLabel}
-          </button>
-        )}
-        <button
-          onClick={handleCopy}
-          className={`btn btn-primary ${copyFeedback ? 'copied' : ''}`}
-        >
-          {copyFeedback ? <CheckIcon /> : <CopyIcon />}
-          {copyFeedback ? 'Copied' : 'Copy Results'}
+      {isEditing && (
+        <button onClick={addEntry} className="btn btn-secondary add-entry-btn">
+          <PlusIcon />
+          Add Entry
         </button>
+      )}
+
+      <div className="results-actions">
+        <div className="results-main-actions">
+          {onSave && (
+            <button onClick={handleSave} className="btn btn-primary">
+              <SaveIcon />
+              {saveLabel}
+            </button>
+          )}
+          <button
+            onClick={handleCopy}
+            className={`btn btn-primary ${copyFeedback ? 'copied' : ''}`}
+          >
+            {copyFeedback ? <CheckIcon /> : <CopyIcon />}
+            {copyFeedback ? 'Copied' : 'Copy Results'}
+          </button>
+        </div>
         <button onClick={onScanAnother} className="btn btn-secondary">
           <ScanIcon />
           Scan Another Page
-        </button>
-        <button onClick={onDone} className="btn btn-secondary">
-          Done
         </button>
       </div>
     </div>

@@ -9,7 +9,6 @@ import {
 import { ResultsDisplay } from './ResultsDisplay';
 import {
   BookIcon,
-  CloseIcon,
   CopyIcon,
   DownloadIcon,
   PenIcon,
@@ -209,9 +208,6 @@ export function LibraryPage({
           onClick={() => setSelectedPage(null)}
         >
           <div className="modal-content page-detail-modal" onClick={event => event.stopPropagation()}>
-            <button className="modal-close" onClick={() => setSelectedPage(null)} aria-label="Close page">
-              <CloseIcon />
-            </button>
             <ResultsDisplay
               extraction={selectedPage.extraction}
               initialTitle={selectedPage.title}

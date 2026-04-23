@@ -144,6 +144,7 @@ svg {
 
 .header-actions {
   display: flex;
+  align-items: center;
   justify-content: end;
   gap: 0.65rem;
 }
@@ -225,11 +226,25 @@ svg {
 
 .hero-actions,
 .upload-actions,
-.modal-actions,
-.results-actions {
+.modal-actions {
   display: flex;
   gap: 0.8rem;
   flex-wrap: wrap;
+}
+
+.results-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.results-main-actions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.results-main-actions .btn {
+  flex: 1;
 }
 
 .stats-grid {
@@ -546,7 +561,7 @@ svg {
   text-align: center;
 }
 
-.empty-library svg {
+.empty-library > svg {
   width: 2.4rem;
   height: 2.4rem;
   color: var(--green);
@@ -710,6 +725,12 @@ svg {
   padding-bottom: 1rem;
 }
 
+.results-header-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
 .results-date {
   color: var(--muted);
   font-size: 0.9rem;
@@ -748,6 +769,11 @@ svg {
 .results-entries {
   display: grid;
   gap: 1rem;
+}
+
+/* Sits directly below the entries list; justify-self keeps it compact (not full-width). */
+.add-entry-btn {
+  justify-self: start;
 }
 
 .journal-entry {
@@ -807,10 +833,7 @@ svg {
   text-align: center;
 }
 
-.results-actions {
-  display: grid;
-  grid-template-columns: 1fr;
-}
+
 
 .settings-group {
   display: grid;

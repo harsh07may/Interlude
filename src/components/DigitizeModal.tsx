@@ -72,9 +72,11 @@ export function DigitizeModal({ isOpen, ocrConfig, onSaveScan, onClose }: Digiti
       aria-labelledby="digitize-title"
     >
       <div className="modal-content digitize-modal" onClick={e => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">
-          <CloseIcon />
-        </button>
+        {step !== 'results' && (
+          <button className="modal-close" onClick={onClose} aria-label="Close">
+            <CloseIcon />
+          </button>
+        )}
 
         {step === 'upload' && (
           <>
