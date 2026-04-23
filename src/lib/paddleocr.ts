@@ -1,5 +1,5 @@
 import { parseOCROutput } from './ocrParser';
-import { OCRExtraction, OCRError } from '../types';
+import type { OCRExtraction, OCRError } from '../types';
 
 let paddleOCR: any = null;
 
@@ -7,6 +7,8 @@ export async function initializePaddleOCR(): Promise<void> {
   if (paddleOCR) return;
 
   try {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore — paddleocr types not available; installed at runtime
     const { PaddleOCR } = await import('paddleocr');
     paddleOCR = new PaddleOCR({
       ocr_version: 'pp-ocr-server',
@@ -72,6 +74,6 @@ function fileToDataUrl(file: File): Promise<string> {
 
 function flattenOCRResult(result: any[][]): string {
   return result
-    .map(([text]: [string, number]) => text)
+    .map((item: any[]) => item[0] as string)
     .join('\n');
 }

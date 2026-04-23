@@ -1,5 +1,5 @@
-import React from 'react';
-import { OCRExtraction } from '../types';
+import { useState } from 'react';
+import type { OCRExtraction } from '../types';
 import { copyExtractionToClipboard } from '../lib/utils';
 
 interface ResultsDisplayProps {
@@ -9,7 +9,7 @@ interface ResultsDisplayProps {
 }
 
 export function ResultsDisplay({ extraction, onScanAnother, onDone }: ResultsDisplayProps) {
-  const [copyFeedback, setCopyFeedback] = React.useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
 
   const handleCopy = async () => {
     try {

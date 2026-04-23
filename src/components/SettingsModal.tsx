@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { OCRConfig } from '../types';
+import { useState } from 'react';
+import type { OCRConfig } from '../types';
 import { testBackendConnection } from '../lib/backendOcr';
 
 interface SettingsModalProps {

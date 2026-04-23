@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { OCRExtraction, OCRError, OCRConfig } from '../types';
+import { useState } from 'react';
+import type { OCRExtraction, OCRError, OCRConfig } from '../types';
 import { useImageUpload } from '../hooks/useImageUpload';
 import { runClientSideOCR } from '../lib/paddleocr';
 import { runBackendOCR } from '../lib/backendOcr';

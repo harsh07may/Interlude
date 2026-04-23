@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { OCRError } from '../types';
+import type { OCRError } from '../types';
 import { validateImageFile } from '../lib/utils';
 
 export function useImageUpload() {

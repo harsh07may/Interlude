@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { OCRConfig } from '../types';
+import type { OCRConfig } from '../types';
 
 const STORAGE_KEY = 'journal-digitizer-ocr-config';
 

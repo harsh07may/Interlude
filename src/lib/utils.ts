@@ -1,4 +1,4 @@
-import { OCRExtraction } from '../types';
+import type { OCRExtraction } from '../types';
 import { formatExtractionAsText } from './ocrParser';
 
 export async function copyToClipboard(text: string): Promise<void> {

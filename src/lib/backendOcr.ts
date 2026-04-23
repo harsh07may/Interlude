@@ -1,5 +1,5 @@
 import { parseOCROutput } from './ocrParser';
-import { OCRExtraction, BackendOCRResponse, OCRError } from '../types';
+import type { OCRExtraction, BackendOCRResponse, OCRError } from '../types';
 
 export async function runBackendOCR(
   image: File,

@@ -1,4 +1,4 @@
-import { OCRExtraction, JournalEntry } from '../types';
+import type { OCRExtraction, JournalEntry } from '../types';
 
 export function parseOCROutput(rawText: string): OCRExtraction {
   const lines = rawText.split('\n').map(line => line.trim()).filter(Boolean);
