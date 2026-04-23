@@ -6,8 +6,18 @@ export interface OCRExtraction {
 }
 
 export interface JournalEntry {
+  id?: string;
   timestamp: string;
   text: string;
+}
+
+export interface ScannedPage {
+  id: string;
+  title: string;
+  tags: string[];
+  extraction: OCRExtraction;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface OCRConfig {
@@ -15,11 +25,6 @@ export interface OCRConfig {
   geminiApiKey?: string;
   geminiModel?: string;
   backendUrl?: string;
-}
-
-export interface UploadedImage {
-  file: File;
-  preview: string;
 }
 
 export interface OCRError {

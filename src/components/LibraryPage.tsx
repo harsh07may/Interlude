@@ -1,0 +1,309 @@
+import { useMemo, useState } from 'react';
+import type { OCRExtraction, ScannedPage } from '../types';
+import {
+  copyPageToClipboard,
+  downloadAllPagesAsJson,
+  downloadPageAsText,
+  formatPageAsMarkdown,
+} from '../lib/utils';
+import { ResultsDisplay } from './ResultsDisplay';
+
+interface LibraryPageProps {
+  pages: ScannedPage[];
+  onBackHome: () => void;
+  onDigitizeClick: () => void;
+  onSettingsClick: () => void;
+  onUpdatePage: (pageId: string, updates: Pick<ScannedPage, 'title' | 'tags' | 'extraction'>) => void;
+  onDeletePage: (pageId: string) => void;
+}
+
+export function LibraryPage({
+  pages,
+  onBackHome,
+  onDigitizeClick,
+  onSettingsClick,
+  onUpdatePage,
+  onDeletePage,
+}: LibraryPageProps) {
+  const [query, setQuery] = useState('');
+  const [activeTag, setActiveTag] = useState('');
+  const [selectedPage, setSelectedPage] = useState<ScannedPage | null>(null);
+
+  const tags = useMemo(
+    () => Array.from(new Set(pages.flatMap(page => page.tags))).sort(),
+    [pages]
+  );
+
+  const filteredPages = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return pages.filter(page => {
+      const matchesTag = !activeTag || page.tags.includes(activeTag);
+      const haystack = formatPageAsMarkdown(page).toLowerCase();
+      return matchesTag && (!needle || haystack.includes(needle));
+    });
+  }, [activeTag, pages, query]);
+
+  const totalEntries = pages.reduce((count, page) => count + page.extraction.entries.length, 0);
+
+  const handleUpdateSelected = (extraction: OCRExtraction, title: string, tags: string[]) => {
+    if (!selectedPage) return;
+    onUpdatePage(selectedPage.id, { extraction, title, tags });
+    setSelectedPage({ ...selectedPage, extraction, title, tags, updatedAt: new Date().toISOString() });
+  };
+
+  return (
+    <div className="dashboard library-page">
+      <header className="dashboard-header">
+        <button className="brand-button" onClick={onBackHome}>
+          <span className="brand-mark" aria-hidden="true">
+            <PenIcon />
+          </span>
+          <span className="brand-copy">
+            <span className="eyebrow">Interlude</span>
+            <span className="brand-title">Journal Digitizer</span>
+          </span>
+        </button>
+        <div className="header-actions">
+          <button className="btn btn-secondary" onClick={onDigitizeClick}>
+            <ScanIcon />
+            New Scan
+          </button>
+          <button className="icon-button" onClick={onSettingsClick} title="Settings" aria-label="Open OCR settings">
+            <SettingsIcon />
+          </button>
+        </div>
+      </header>
+
+      <main className="dashboard-main library-main">
+        <div className="stats-grid" aria-label="Journal library statistics">
+          <div>
+            <strong>{pages.length}</strong>
+            <span>Pages</span>
+          </div>
+          <div>
+            <strong>{totalEntries}</strong>
+            <span>Entries</span>
+          </div>
+          <div>
+            <strong>{tags.length}</strong>
+            <span>Tags</span>
+          </div>
+        </div>
+
+        <section className="library-section" aria-labelledby="library-title">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">Library</span>
+              <h1 id="library-title">Scanned Pages</h1>
+            </div>
+            <button
+              className="btn btn-secondary"
+              onClick={() => downloadAllPagesAsJson(pages)}
+              disabled={pages.length === 0}
+            >
+              <DownloadIcon />
+              Export JSON
+            </button>
+          </div>
+
+          <div className="library-tools">
+            <label className="search-field">
+              <SearchIcon />
+              <input
+                type="search"
+                placeholder="Search titles, tags, or entry text"
+                value={query}
+                onChange={event => setQuery(event.target.value)}
+              />
+            </label>
+            <div className="tag-filters" aria-label="Filter by tag">
+              <button
+                className={!activeTag ? 'tag-chip active' : 'tag-chip'}
+                onClick={() => setActiveTag('')}
+              >
+                All
+              </button>
+              {tags.map(tag => (
+                <button
+                  key={tag}
+                  className={activeTag === tag ? 'tag-chip active' : 'tag-chip'}
+                  onClick={() => setActiveTag(tag)}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {filteredPages.length > 0 ? (
+            <div className="page-grid">
+              {filteredPages.map(page => (
+                <article className="page-card" key={page.id}>
+                  <button className="page-card-main" onClick={() => setSelectedPage(page)}>
+                    <span className="page-date">{page.extraction.date || 'No date'}</span>
+                    <h2>{page.title}</h2>
+                    <p>{page.extraction.entries[0]?.text || 'No entries on this page yet.'}</p>
+                  </button>
+                  <div className="page-meta">
+                    <span>{page.extraction.entries.length} entries</span>
+                    <span>{formatShortDate(page.updatedAt)}</span>
+                  </div>
+                  {page.tags.length > 0 && (
+                    <div className="page-tags">
+                      {page.tags.map(tag => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="page-actions">
+                    <button onClick={() => copyPageToClipboard(page)} className="icon-button" aria-label="Copy page">
+                      <CopyIcon />
+                    </button>
+                    <button onClick={() => downloadPageAsText(page)} className="icon-button" aria-label="Export page">
+                      <DownloadIcon />
+                    </button>
+                    <button
+                      onClick={() => onDeletePage(page.id)}
+                      className="icon-button danger-button"
+                      aria-label="Delete page"
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-library">
+              <BookIcon />
+              <h2>{pages.length ? 'No matching pages' : 'No scans saved yet'}</h2>
+              <p>{pages.length ? 'Try another search or tag filter.' : 'Digitize a page and save it to build your archive.'}</p>
+              <button onClick={onDigitizeClick} className="btn btn-primary">
+                <ScanIcon />
+                Digitize Page
+              </button>
+            </div>
+          )}
+        </section>
+      </main>
+
+      {selectedPage && (
+        <div
+          className="modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="page-detail-title"
+          onClick={() => setSelectedPage(null)}
+        >
+          <div className="modal-content page-detail-modal" onClick={event => event.stopPropagation()}>
+            <button className="modal-close" onClick={() => setSelectedPage(null)} aria-label="Close page">
+              <CloseIcon />
+            </button>
+            <ResultsDisplay
+              extraction={selectedPage.extraction}
+              initialTitle={selectedPage.title}
+              initialTags={selectedPage.tags}
+              saveLabel="Update Page"
+              onSave={handleUpdateSelected}
+              onScanAnother={() => {
+                setSelectedPage(null);
+                onDigitizeClick();
+              }}
+              onDone={() => setSelectedPage(null)}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatShortDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(value));
+}
+
+function PenIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
+
+function ScanIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M7 3H5a2 2 0 0 0-2 2v2" />
+      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+      <path d="M7 12h10" />
+    </svg>
+  );
+}
+
+function SettingsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+      <path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.05.05a2 2 0 1 1-2.83 2.83l-.05-.05a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.65V21a2 2 0 1 1-4 0v-.08A1.8 1.8 0 0 0 8.75 19.3a1.8 1.8 0 0 0-1.98.36l-.05.05a2 2 0 1 1-2.83-2.83l.05-.05A1.8 1.8 0 0 0 4.3 14.85a1.8 1.8 0 0 0-1.65-1.1H2.6a2 2 0 1 1 0-4h.08A1.8 1.8 0 0 0 4.3 8.65a1.8 1.8 0 0 0-.36-1.98l-.05-.05a2 2 0 1 1 2.83-2.83l.05.05a1.8 1.8 0 0 0 1.98.36A1.8 1.8 0 0 0 9.85 2.6V2.5a2 2 0 1 1 4 0v.08a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 1.98-.36l.05-.05a2 2 0 1 1 2.83 2.83l-.05.05a1.8 1.8 0 0 0-.36 1.98 1.8 1.8 0 0 0 1.65 1.1h.08a2 2 0 1 1 0 4h-.08A1.8 1.8 0 0 0 19.4 15Z" />
+    </svg>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="m21 21-4.3-4.3" />
+      <path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 8h11v11H8z" />
+      <path d="M5 16H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </svg>
+  );
+}
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 3v12" />
+      <path d="m7 10 5 5 5-5" />
+      <path d="M5 21h14" />
+    </svg>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6 18 20H6L5 6" />
+    </svg>
+  );
+}
+
+function BookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5Z" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}

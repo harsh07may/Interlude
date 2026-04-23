@@ -1,5 +1,6 @@
 import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, BackendOCRResponse, OCRError } from '../types';
+import { getUploadError } from './utils';
 
 export async function runBackendOCR(
   image: File,
@@ -26,21 +27,8 @@ export async function runBackendOCR(
       } satisfies OCRError;
     }
 
-    const maxSize = 10 * 1024 * 1024;
-    if (image.size > maxSize) {
-      throw {
-        code: 'file-too-large',
-        message: 'Image is too large. Please use a smaller file.',
-      } satisfies OCRError;
-    }
-
-    const validFormats = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (!validFormats.includes(image.type)) {
-      throw {
-        code: 'format-unsupported',
-        message: 'Please upload JPG, PNG, or PDF.',
-      } satisfies OCRError;
-    }
+    const uploadError = getUploadError(image);
+    if (uploadError) throw uploadError;
 
     const formData = new FormData();
     formData.append('image', image);

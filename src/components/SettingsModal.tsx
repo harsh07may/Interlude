@@ -27,7 +27,10 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
   };
 
   const handleTestConnection = async () => {
-    if (!backendUrl.trim()) { setConnectionStatus('failed'); return; }
+    if (!backendUrl.trim()) {
+      setConnectionStatus('failed');
+      return;
+    }
     setTestingConnection(true);
     const success = await testBackendConnection(backendUrl);
     setConnectionStatus(success ? 'success' : 'failed');
@@ -35,9 +38,13 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
   };
 
   return (
-    <div className="modal-overlay" onClick={onCancel}>
+    <div className="modal-overlay" onClick={onCancel} role="dialog" aria-modal="true" aria-labelledby="settings-title">
       <div className="modal-content settings-modal" onClick={e => e.stopPropagation()}>
-        <h2>OCR Settings</h2>
+        <button className="modal-close" onClick={onCancel} aria-label="Close settings">
+          <CloseIcon />
+        </button>
+        <span className="eyebrow">Configuration</span>
+        <h2 id="settings-title">OCR Settings</h2>
 
         <div className="settings-group">
           <label className="radio-group">
@@ -46,11 +53,14 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
               name="ocr-method"
               value="gemini"
               checked={method === 'gemini'}
-              onChange={() => { setMethod('gemini'); setConnectionStatus('idle'); }}
+              onChange={() => {
+                setMethod('gemini');
+                setConnectionStatus('idle');
+              }}
             />
             <span className="radio-label">
               <strong>Gemini AI</strong>
-              <small>Best accuracy — uses your Google AI Studio API key</small>
+              <small>Best accuracy. Uses your Google AI Studio API key.</small>
             </span>
           </label>
 
@@ -60,7 +70,10 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
               name="ocr-method"
               value="backend-api"
               checked={method === 'backend-api'}
-              onChange={() => { setMethod('backend-api'); setConnectionStatus('idle'); }}
+              onChange={() => {
+                setMethod('backend-api');
+                setConnectionStatus('idle');
+              }}
             />
             <span className="radio-label">
               <strong>Backend API</strong>
@@ -72,14 +85,13 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
         {method === 'gemini' && (
           <div className="settings-group backend-config">
             <label htmlFor="gemini-key">
-              Gemini API Key{' '}
+              Gemini API Key
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ fontSize: '0.8rem' }}
               >
-                Get one free →
+                Get a key
               </a>
             </label>
             <input
@@ -90,18 +102,17 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
               onChange={e => setGeminiApiKey(e.target.value)}
               className="input-field"
             />
-            <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '-0.5rem' }}>
+            <p className="field-help">
               Stored locally in your browser. Never sent anywhere except Google's API.
             </p>
-            <label htmlFor="gemini-model" style={{ marginTop: '0.75rem', display: 'block' }}>
-              Model{' '}
+            <label htmlFor="gemini-model">
+              Model
               <a
                 href="https://ai.google.dev/gemini-api/docs/models"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ fontSize: '0.8rem' }}
               >
-                See available models →
+                Models
               </a>
             </label>
             <input
@@ -122,7 +133,10 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
               type="url"
               placeholder="http://localhost:8000/ocr"
               value={backendUrl}
-              onChange={e => { setBackendUrl(e.target.value); setConnectionStatus('idle'); }}
+              onChange={e => {
+                setBackendUrl(e.target.value);
+                setConnectionStatus('idle');
+              }}
               className="input-field"
             />
             <button
@@ -132,8 +146,8 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
             >
               {testingConnection ? 'Testing...' : 'Verify Connection'}
             </button>
-            {connectionStatus === 'success' && <p className="status-success">✓ Connection successful</p>}
-            {connectionStatus === 'failed' && <p className="status-error">✗ Cannot connect to backend</p>}
+            {connectionStatus === 'success' && <p className="status-success">Connection successful</p>}
+            {connectionStatus === 'failed' && <p className="status-error">Cannot connect to backend</p>}
           </div>
         )}
 
@@ -143,5 +157,14 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
         </div>
       </div>
     </div>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
   );
 }

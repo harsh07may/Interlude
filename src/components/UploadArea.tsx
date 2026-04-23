@@ -49,13 +49,16 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
         {isLoading ? (
           <>
             <div className="spinner"></div>
-            <p>Processing image...</p>
+            <p className="upload-title">Reading your page</p>
+            <p className="upload-subtitle">Gemini is transcribing the image and finding entries.</p>
           </>
         ) : (
           <>
-            <div className="upload-icon">📷</div>
+            <div className="upload-icon" aria-hidden="true">
+              <UploadIcon />
+            </div>
             <p className="upload-title">Upload Journal Page</p>
-            <p className="upload-subtitle">Drag and drop your image here</p>
+            <p className="upload-subtitle">Drop a scan here, or choose a file from your device.</p>
 
             <div className="upload-actions">
               {isMobile && (
@@ -63,11 +66,13 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
                   onClick={() => cameraInputRef.current?.click()}
                   className="btn btn-primary"
                 >
-                  📱 Take Photo
+                  <CameraIcon />
+                  Take Photo
                 </button>
               )}
               <button onClick={() => fileInputRef.current?.click()} className="btn btn-primary">
-                📁 Choose File
+                <FolderIcon />
+                Choose File
               </button>
             </div>
 
@@ -95,5 +100,32 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
         />
       )}
     </div>
+  );
+}
+
+function UploadIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 16V4" />
+      <path d="m7 9 5-5 5 5" />
+      <path d="M5 20h14" />
+    </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3Z" />
+      <path d="M12 16a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+    </svg>
+  );
+}
+
+function FolderIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+    </svg>
   );
 }
