@@ -36,7 +36,7 @@ export function DigitizeModal({ isOpen, ocrConfig, onClose }: DigitizeModalProps
       const result =
         ocrConfig.method === 'backend-api' && ocrConfig.backendUrl
           ? await runBackendOCR(file, ocrConfig.backendUrl)
-          : await runGeminiOCR(file, ocrConfig.geminiApiKey ?? '');
+          : await runGeminiOCR(file, ocrConfig.geminiApiKey ?? '', ocrConfig.geminiModel);
 
       setExtraction(result);
       setStep('results');

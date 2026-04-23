@@ -13,6 +13,7 @@ export interface JournalEntry {
 export interface OCRConfig {
   method: 'gemini' | 'backend-api';
   geminiApiKey?: string;
+  geminiModel?: string;
   backendUrl?: string;
 }
 

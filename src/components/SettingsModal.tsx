@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { OCRConfig } from '../types';
 import { testBackendConnection } from '../lib/backendOcr';
+import { GEMINI_DEFAULT_MODEL } from '../lib/geminiOcr';
 
 interface SettingsModalProps {
   config: OCRConfig;
@@ -11,6 +12,7 @@ interface SettingsModalProps {
 export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) {
   const [method, setMethod] = useState<'gemini' | 'backend-api'>(config.method);
   const [geminiApiKey, setGeminiApiKey] = useState(config.geminiApiKey ?? '');
+  const [geminiModel, setGeminiModel] = useState(config.geminiModel ?? GEMINI_DEFAULT_MODEL);
   const [backendUrl, setBackendUrl] = useState(config.backendUrl ?? '');
   const [testingConnection, setTestingConnection] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'failed'>('idle');
@@ -19,6 +21,7 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
     onSave({
       method,
       geminiApiKey: method === 'gemini' ? geminiApiKey : undefined,
+      geminiModel: method === 'gemini' ? geminiModel : undefined,
       backendUrl: method === 'backend-api' ? backendUrl : undefined,
     });
   };
@@ -90,6 +93,24 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
             <p style={{ fontSize: '0.8rem', color: '#888', marginTop: '-0.5rem' }}>
               Stored locally in your browser. Never sent anywhere except Google's API.
             </p>
+            <label htmlFor="gemini-model" style={{ marginTop: '0.75rem', display: 'block' }}>
+              Model{' '}
+              <a
+                href="https://ai.google.dev/gemini-api/docs/models"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: '0.8rem' }}
+              >
+                See available models →
+              </a>
+            </label>
+            <input
+              id="gemini-model"
+              type="text"
+              value={geminiModel}
+              onChange={e => setGeminiModel(e.target.value)}
+              className="input-field"
+            />
           </div>
         )}
 

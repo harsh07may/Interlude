@@ -1,8 +1,8 @@
 import { parseOCROutput } from './ocrParser';
 import type { OCRExtraction, OCRError } from '../types';
 
-const GEMINI_URL =
-  'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent';
+const GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1/models';
+export const GEMINI_DEFAULT_MODEL = 'gemini-1.5-flash-latest';
 
 const PROMPT = `Transcribe all text from this handwritten journal page.
 Output format — one entry per line:
@@ -10,7 +10,11 @@ Output format — one entry per line:
 If there is a date header at the top, put it on the first line before the entries.
 Output only the transcribed text. No commentary, no markdown, no extra formatting.`;
 
-export async function runGeminiOCR(image: File, apiKey: string): Promise<OCRExtraction> {
+export async function runGeminiOCR(
+  image: File,
+  apiKey: string,
+  model = GEMINI_DEFAULT_MODEL
+): Promise<OCRExtraction> {
   if (!apiKey.trim()) {
     throw {
       code: 'ocr-failed',
@@ -19,10 +23,11 @@ export async function runGeminiOCR(image: File, apiKey: string): Promise<OCRExtr
   }
 
   const base64 = await fileToBase64(image);
+  const url = `${GEMINI_BASE}/${model}:generateContent?key=${apiKey}`;
 
   let response: Response;
   try {
-    response = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+    response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
