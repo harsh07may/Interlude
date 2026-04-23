@@ -4,7 +4,7 @@ import type { OCRConfig } from '../types';
 const STORAGE_KEY = 'journal-digitizer-ocr-config';
 
 const DEFAULT_CONFIG: OCRConfig = {
-  method: 'client-side',
+  method: 'gemini',
 };
 
 function loadStoredConfig(): OCRConfig {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { OCRExtraction, OCRError, OCRConfig } from '../types';
 import { useImageUpload } from '../hooks/useImageUpload';
-import { runClientSideOCR } from '../lib/ocr';
+import { runGeminiOCR } from '../lib/geminiOcr';
 import { runBackendOCR } from '../lib/backendOcr';
 import { UploadArea } from './UploadArea';
 import { ResultsDisplay } from './ResultsDisplay';
@@ -36,7 +36,7 @@ export function DigitizeModal({ isOpen, ocrConfig, onClose }: DigitizeModalProps
       const result =
         ocrConfig.method === 'backend-api' && ocrConfig.backendUrl
           ? await runBackendOCR(file, ocrConfig.backendUrl)
-          : await runClientSideOCR(file);
+          : await runGeminiOCR(file, ocrConfig.geminiApiKey ?? '');
 
       setExtraction(result);
       setStep('results');
