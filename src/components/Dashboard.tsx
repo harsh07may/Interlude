@@ -183,7 +183,7 @@ export function Dashboard({
 
         {/* ── Interstitial Journaling ──────────────────────────────────── */}
         <motion.section
-          className="interstitial-section ist-paper"
+          className="interstitial-section"
           aria-labelledby="interstitial-title"
           initial={reduced ? false : { opacity: 0 }}
           whileInView={reduced ? {} : { opacity: 1 }}

@@ -475,6 +475,7 @@ svg {
 /* ─── Interstitial Section ───────────────────────────────────────────────── */
 
 .interstitial-section {
+  background: var(--green);
   position: relative;
   overflow: hidden;
   margin-left: calc(-1 * clamp(1rem, 4vw, 3rem));
@@ -596,32 +597,24 @@ svg {
   color: rgba(255, 250, 240, 0.72);
 }
 
-.ist-paper {
-  background:
-    linear-gradient(rgba(37, 33, 27, 0.055) 1px, transparent 1px),
-    var(--paper-strong);
-  background-size: 100% 38px, auto;
-}
-
-
-.interstitial-eyebrow { color: var(--brass); }
-.interstitial-copy h2 { color: var(--ink); }
-.interstitial-body p  { color: var(--muted); }
+.interstitial-eyebrow { color: rgba(255, 250, 240, 0.5); }
+.interstitial-copy h2 { color: #fffaf0; }
+.interstitial-body p  { color: rgba(255, 250, 240, 0.72); }
 
 .interstitial-quote {
-  color: var(--muted);
-  border-left-color: rgba(184, 121, 58, 0.4);
+  color: rgba(255, 250, 240, 0.65);
+  border-left-color: var(--brass);
 }
 
 .timeline-time { color: var(--brass); }
 
 .timeline-dot {
-  background: rgba(37, 33, 27, 0.25);
-  border-color: var(--line);
+  background: rgba(255, 250, 240, 0.35);
+  border-color: rgba(255, 250, 240, 0.5);
 }
 
-.timeline-text { color: var(--muted); }
-.interstitial-timeline::before { background: var(--line); }
+.timeline-text { color: rgba(255, 250, 240, 0.72); }
+.interstitial-timeline::before { background: rgba(255, 250, 240, 0.15); }
 
 /* ─── Features Section ───────────────────────────────────────────────────── */
 
