@@ -184,8 +184,14 @@ svg {
   padding: clamp(1rem, 4vw, 3rem);
 }
 
+.library-page {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
 .library-main {
   padding-top: 0;
+  align-self: start;
 }
 
 /* ─── Library Banner ─────────────────────────────────────────────────────── */
