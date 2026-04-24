@@ -1,6 +1,7 @@
 // ─── Storage ──────────────────────────────────────────────────────────────────
 
 export const STORAGE_KEY_OCR_CONFIG = 'journal-digitizer-ocr-config';
+export const SESSION_KEY_GEMINI_API_KEY = 'journal-digitizer-gemini-key';
 export const STORAGE_KEY_PAGES = 'journal-digitizer-scanned-pages';
 
 // ─── Routes ───────────────────────────────────────────────────────────────────

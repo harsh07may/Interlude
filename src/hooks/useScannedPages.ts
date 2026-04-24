@@ -18,12 +18,26 @@ function normalizePage(page: ScannedPage): ScannedPage {
   };
 }
 
+function isValidPage(value: unknown): value is ScannedPage {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.id === 'string' &&
+    typeof v.title === 'string' &&
+    Array.isArray(v.tags) &&
+    typeof v.extraction === 'object' && v.extraction !== null &&
+    typeof v.createdAt === 'string' &&
+    typeof v.updatedAt === 'string'
+  );
+}
+
 function loadStoredPages(): ScannedPage[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY_PAGES);
     if (!stored) return [];
-    const pages = JSON.parse(stored) as ScannedPage[];
-    return pages.map(normalizePage);
+    const parsed: unknown = JSON.parse(stored);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(isValidPage).map(normalizePage);
   } catch {
     return [];
   }

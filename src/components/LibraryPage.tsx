@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { useMemo, useState } from 'react';
 import type { OCRExtraction, ScannedPage } from '../types';
 import {
@@ -70,10 +71,7 @@ export function LibraryPage({
           <span className="brand-mark" aria-hidden="true">
             <PenIcon />
           </span>
-          <span className="brand-copy">
-            <span className="eyebrow">Interlude</span>
-            <span className="brand-title">Journal Digitizer</span>
-          </span>
+          <span className="brand-wordmark">Interlude</span>
         </button>
         <div className="header-actions">
           <button className="icon-button" onClick={onDigitizeClick} title="New Scan" aria-label="Start a new scan">
@@ -86,47 +84,65 @@ export function LibraryPage({
       </header>
 
       <main className="dashboard-main library-main">
-        <div className="stats-grid" aria-label="Journal library statistics">
-          <div>
-            <strong>{pages.length}</strong>
-            <span>Pages</span>
+        <motion.div
+          className="library-banner"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+        >
+          <div className="library-banner-copy">
+            <span className="eyebrow">Your collection</span>
+            <h1 className="library-banner-title">The Library</h1>
           </div>
-          <div>
-            <strong>{totalEntries}</strong>
-            <span>Entries</span>
+          <div className="library-stats" aria-label="Journal library statistics">
+            {([
+              { value: pages.length, label: 'Pages' },
+              { value: totalEntries, label: 'Entries' },
+              { value: tags.length, label: 'Tags' },
+            ] as const).map(({ value, label }, i) => (
+              <motion.div
+                key={label}
+                className="library-stat"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+              >
+                <strong>{value}</strong>
+                <span>{label}</span>
+              </motion.div>
+            ))}
           </div>
-          <div>
-            <strong>{tags.length}</strong>
-            <span>Tags</span>
-          </div>
-        </div>
+        </motion.div>
 
         <section className="library-section" aria-labelledby="library-title">
           <div className="section-heading">
             <div>
-              <span className="eyebrow">Library</span>
-              <h1 id="library-title">Scanned Pages</h1>
+              <span className="eyebrow">Browse</span>
+              <h2 id="library-title">Scanned Pages</h2>
             </div>
-            <button
-              className="btn btn-secondary"
-              onClick={() => downloadAllPagesAsJson(pages)}
-              disabled={pages.length === 0}
-            >
-              <DownloadIcon />
-              Export JSON
-            </button>
           </div>
 
           <div className="library-tools">
-            <label className="search-field">
-              <SearchIcon />
-              <input
-                type="search"
-                placeholder="Search titles, tags, or entry text"
-                value={query}
-                onChange={event => setQuery(event.target.value)}
-              />
-            </label>
+            <div className="search-row">
+              <label className="search-field">
+                <SearchIcon />
+                <input
+                  type="search"
+                  placeholder="Search titles, tags, or entry text"
+                  value={query}
+                  onChange={event => setQuery(event.target.value)}
+                />
+              </label>
+              <button
+                className="icon-button"
+                onClick={() => downloadAllPagesAsJson(pages)}
+                disabled={pages.length === 0}
+                title="Export all pages as JSON"
+                aria-label="Export all pages as JSON"
+              >
+                <DownloadIcon />
+              </button>
+            </div>
             <div className="tag-filters" aria-label="Filter by tag">
               <button
                 className={!activeTag ? 'tag-chip active' : 'tag-chip'}
@@ -197,6 +213,24 @@ export function LibraryPage({
           )}
         </section>
       </main>
+
+      <footer className="site-footer">
+        <div className="footer-inner">
+          <div className="footer-brand">
+            <div className="footer-logo" aria-hidden="true">
+              <PenIcon />
+            </div>
+            <p className="footer-wordmark">Interlude</p>
+            <p className="footer-tagline">Handwriting, finally searchable.</p>
+          </div>
+          <div className="footer-pills">
+            <span className="footer-pill">Gemini OCR</span>
+            <span className="footer-pill">Private &amp; local</span>
+            <span className="footer-pill">JPG · PNG · PDF</span>
+          </div>
+          <p className="footer-copy">© 2026 Interlude — made with ink &amp; intention.</p>
+        </div>
+      </footer>
 
       {selectedPage && (
         <div

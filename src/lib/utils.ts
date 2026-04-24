@@ -7,31 +7,34 @@ export function createId(): string {
   return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+// Cloud metadata and link-local ranges that must never be reachable via user-supplied URLs.
+// Covers AWS/GCP/Azure IMDS (169.254.169.254), CGNAT (100.64/10), and IPv6 equivalents.
+const BLOCKED_IP_PREFIXES = [
+  '169.254.', // IPv4 link-local / cloud metadata (AWS, GCP, Azure IMDS)
+  '100.64.',  // CGNAT range — used by some cloud providers for internal routing
+  'fe80:',    // IPv6 link-local
+  'fd',       // IPv6 ULA (fd00::/8 — private unicast)
+];
+
 /**
- * Returns `true` if `url` is a non-empty string with an http(s) protocol.
- * Used to guard both OCR calls and connection tests against bad backend URLs.
+ * Returns `true` if `url` is a non-empty http(s) URL that does not point at
+ * cloud metadata / link-local ranges. Localhost and private LAN addresses are
+ * allowed because they are the expected target for a local OCR backend.
  */
 export function isValidBackendUrl(url: string): boolean {
   if (!url.trim()) return false;
   try {
-    const { protocol } = new URL(url);
-    return protocol === 'http:' || protocol === 'https:';
+    const { protocol, hostname } = new URL(url);
+    if (protocol !== 'http:' && protocol !== 'https:') return false;
+    const lower = hostname.toLowerCase();
+    return !BLOCKED_IP_PREFIXES.some(prefix => lower.startsWith(prefix));
   } catch {
     return false;
   }
 }
 
 async function copyToClipboard(text: string): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-  }
+  await navigator.clipboard.writeText(text);
 }
 
 export async function copyExtractionToClipboard(extraction: OCRExtraction): Promise<void> {

@@ -104,7 +104,7 @@ export function SettingsModal({ config, onSave, onCancel }: SettingsModalProps) 
               className="input-field"
             />
             <p className="field-help">
-              Stored locally in your browser. Never sent anywhere except Google's API.
+              Stored in session only — cleared when you close this tab. Sent only to Google's API.
             </p>
             <label htmlFor="gemini-model">
               Model
