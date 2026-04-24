@@ -35,19 +35,15 @@ export function Dashboard({
       <main className="dashboard-main">
         <section className="hero-panel" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <span className="eyebrow">Handwriting to structured entries</span>
-            <h2 id="hero-title">Turn today's journal page into clean, copyable text.</h2>
+            <span className="eyebrow">Your handwriting, finally searchable</span>
+            <h2 id="hero-title">Ink it,<br />sync it !</h2>
             <p>
-              Capture a page, extract the date and timestamps, then keep the entries moving with a tidy review screen.
+              Your handwriting deserves a search bar. Snap a page, get clean text back.
             </p>
             <div className="hero-actions">
               <button onClick={onDigitizeClick} className="btn btn-large btn-primary">
                 <ScanIcon />
                 Digitize Page
-              </button>
-              <button onClick={onSettingsClick} className="btn btn-large btn-secondary">
-                <SettingsIcon />
-                OCR Settings
               </button>
               <button onClick={onLibraryClick} className="btn btn-large btn-secondary">
                 <BookIcon />

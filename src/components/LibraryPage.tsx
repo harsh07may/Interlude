@@ -76,9 +76,8 @@ export function LibraryPage({
           </span>
         </button>
         <div className="header-actions">
-          <button className="btn btn-secondary" onClick={onDigitizeClick}>
+          <button className="icon-button" onClick={onDigitizeClick} title="New Scan" aria-label="Start a new scan">
             <ScanIcon />
-            New Scan
           </button>
           <button className="icon-button" onClick={onSettingsClick} title="Settings" aria-label="Open OCR settings">
             <SettingsIcon />

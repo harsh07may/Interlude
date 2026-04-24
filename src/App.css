@@ -16,6 +16,7 @@
   --radius: 8px;
   --font-ui: Avenir Next, Segoe UI, system-ui, sans-serif;
   --font-serif: Iowan Old Style, Charter, Georgia, serif;
+  --font-display: 'Mansalva', cursive;
   --font-mono: SFMono-Regular, Consolas, Liberation Mono, monospace;
 }
 
@@ -212,10 +213,11 @@ svg {
 
 .hero-copy h2 {
   max-width: 780px;
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-size: 5rem;
   line-height: 0.98;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .hero-copy p {
@@ -1011,6 +1013,10 @@ svg {
   .brand-mark {
     width: 40px;
     height: 40px;
+  }
+
+  .brand-title {
+    display: none;
   }
 
   .dashboard-header h1 {
