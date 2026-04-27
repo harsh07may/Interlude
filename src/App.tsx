@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useOCRConfig } from './hooks/useOCRConfig';
 import { useScannedPages } from './hooks/useScannedPages';
 import { Dashboard } from './components/Dashboard';
@@ -9,33 +10,13 @@ import type { OCRConfig, OCRExtraction } from './types';
 import { ROUTE_HOME, ROUTE_LIBRARY } from './constants';
 import './App.css';
 
-type Route = string;
-
-// Called both as a lazy initializer (useState(getRoute)) and inside the
-// popstate listener (setRoute(getRoute())). Both paths are intentional.
-function getRoute(): Route {
-  return window.location.pathname === ROUTE_LIBRARY ? ROUTE_LIBRARY : ROUTE_HOME;
-}
-
 function App() {
   const ocrConfig = useOCRConfig();
   const scannedPages = useScannedPages();
-  const [route, setRoute] = useState<Route>(getRoute);
   const [showDigitizeModal, setShowDigitizeModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-
-  useEffect(() => {
-    const handlePopState = () => setRoute(getRoute());
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
-
-  const navigate = (nextRoute: Route) => {
-    if (nextRoute !== route) {
-      window.history.pushState(null, '', nextRoute);
-      setRoute(nextRoute);
-    }
-  };
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   const handleSettingsSave = (newConfig: OCRConfig) => {
     ocrConfig.setConfig(newConfig);
@@ -50,7 +31,7 @@ function App() {
 
   return (
     <div className="app">
-      {route === ROUTE_LIBRARY ? (
+      {pathname === ROUTE_LIBRARY ? (
         <LibraryPage
           pages={scannedPages.pages}
           onBackHome={() => navigate(ROUTE_HOME)}
