@@ -6,8 +6,11 @@ export const STORAGE_KEY_PAGES = 'journal-digitizer-scanned-pages';
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-export const ROUTE_HOME = '/';
-export const ROUTE_LIBRARY = '/library';
+// Strip the trailing slash so we can append route segments cleanly.
+// import.meta.env.BASE_URL is '/' in dev and '/Interlude/' in production.
+const _base = import.meta.env.BASE_URL.replace(/\/$/, '');
+export const ROUTE_HOME = _base + '/';
+export const ROUTE_LIBRARY = _base + '/library';
 
 // ─── Gemini API ───────────────────────────────────────────────────────────────
 

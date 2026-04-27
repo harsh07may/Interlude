@@ -9,7 +9,7 @@ import type { OCRConfig, OCRExtraction } from './types';
 import { ROUTE_HOME, ROUTE_LIBRARY } from './constants';
 import './App.css';
 
-type Route = typeof ROUTE_HOME | typeof ROUTE_LIBRARY;
+type Route = string;
 
 // Called both as a lazy initializer (useState(getRoute)) and inside the
 // popstate listener (setRoute(getRoute())). Both paths are intentional.
