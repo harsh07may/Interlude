@@ -478,6 +478,44 @@ svg {
   .journal-float { animation: none; }
 }
 
+/* ─── Product Demo Section ───────────────────────────────────────────────── */
+
+.demo-section {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 2rem;
+}
+
+.demo-intro {
+  display: grid;
+  gap: 0.4rem;
+  text-align: center;
+  justify-items: center;
+}
+
+.demo-intro h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.12;
+}
+
+.demo-frame {
+  border: 1px solid rgba(37, 33, 27, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  background: var(--ink);
+}
+
+.demo-video {
+  width: 100%;
+  display: block;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
 /* ─── Interstitial Section ───────────────────────────────────────────────── */
 
 .interstitial-section {

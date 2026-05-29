@@ -180,6 +180,56 @@ export function Dashboard({
           </motion.div>
         </section>
 
+        {/* ── Product Demo ─────────────────────────────────────────────── */}
+        <motion.section
+          className="demo-section"
+          aria-labelledby="demo-title"
+          initial={reduced ? false : { opacity: 0, y: 32 }}
+          whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.65, ease: ANIM_EASE }}
+        >
+          <div className="demo-intro">
+            <motion.span
+              className="eyebrow"
+              initial={reduced ? false : { opacity: 0, y: 12 }}
+              whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, ease: ANIM_EASE }}
+            >
+              See it in action
+            </motion.span>
+            <motion.h2
+              id="demo-title"
+              initial={reduced ? false : { opacity: 0, y: 18 }}
+              whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.55, delay: 0.08, ease: ANIM_EASE }}
+            >
+              From ink to searchable text
+            </motion.h2>
+          </div>
+
+          <motion.div
+            className="demo-frame"
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            whileInView={reduced ? {} : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6, delay: 0.18, ease: ANIM_EASE }}
+          >
+            <video
+              className="demo-video"
+              src={`${import.meta.env.BASE_URL}product_demo.mp4`}
+              autoPlay={!reduced}
+              muted
+              loop
+              playsInline
+              controls
+              aria-label="Product demo: uploading a handwritten journal page and receiving structured, searchable text"
+            />
+          </motion.div>
+        </motion.section>
+
         {/* ── Interstitial Journaling ──────────────────────────────────── */}
         <motion.section
           className="interstitial-section"
