@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import type { JournalEntry, OCRExtraction } from '../types';
-import { copyExtractionToClipboard } from '../lib/utils';
-import { createId } from '../lib/utils';
+import { addEntryIds, copyExtractionToClipboard, createId } from '../lib/utils';
 import { COPY_FEEDBACK_MS, DEFAULT_PAGE_TITLE } from '../constants';
 import {
   CheckIcon,
@@ -24,13 +23,6 @@ interface ResultsDisplayProps {
   onSave?: (extraction: OCRExtraction, title: string, tags: string[]) => void;
 }
 
-function withEntryIds(extraction: OCRExtraction): OCRExtraction {
-  return {
-    ...extraction,
-    entries: extraction.entries.map(entry => ({ ...entry, id: entry.id ?? createId() })),
-  };
-}
-
 export function ResultsDisplay({
   extraction,
   initialTitle,
@@ -42,7 +34,7 @@ export function ResultsDisplay({
 }: ResultsDisplayProps) {
   const [copyFeedback, setCopyFeedback] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [draftExtraction, setDraftExtraction] = useState(() => withEntryIds(extraction));
+  const [draftExtraction, setDraftExtraction] = useState(() => addEntryIds(extraction));
   const [title, setTitle] = useState(initialTitle ?? extraction.date ?? DEFAULT_PAGE_TITLE);
   const [tags, setTags] = useState(initialTags.join(', '));
 

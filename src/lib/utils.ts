@@ -7,6 +7,13 @@ export function createId(): string {
   return crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+export function addEntryIds(extraction: OCRExtraction): OCRExtraction {
+  return {
+    ...extraction,
+    entries: extraction.entries.map(entry => ({ ...entry, id: entry.id ?? createId() })),
+  };
+}
+
 // Cloud metadata and link-local ranges that must never be reachable via user-supplied URLs.
 // Covers AWS/GCP/Azure IMDS (169.254.169.254), CGNAT (100.64/10), and IPv6 equivalents.
 const BLOCKED_IP_PREFIXES = [
@@ -62,22 +69,15 @@ export function formatPageAsMarkdown(page: ScannedPage): string {
   const title = page.title.trim();
   const date = page.extraction.date.trim();
   const titleIsDate = title.toLowerCase() === date.toLowerCase();
-  const lines = [
-    `# ${title}`,
-    '',
+
+  const meta = [
     date && !titleIsDate ? `Date: ${date}` : '',
     page.tags.length ? `Tags: ${page.tags.join(', ')}` : '',
-    '',
-    formatExtractionAsText(page.extraction),
-  ];
+  ].filter(Boolean).join('\n');
 
-  // Keep a blank line only when the preceding line was non-empty (prevents consecutive blanks).
-  return (
-    lines
-      .filter((line, index) => line || lines[index - 1])
-      .join('\n')
-      .trim() + '\n'
-  );
+  return [`# ${title}`, meta, formatExtractionAsText(page.extraction)]
+    .filter(Boolean)
+    .join('\n\n') + '\n';
 }
 
 function downloadFile(filename: string, content: string, type: string) {

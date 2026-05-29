@@ -7,6 +7,7 @@ import {
   downloadPageAsText,
   formatPageAsMarkdown,
 } from '../lib/utils';
+import { ANIM_EASE } from '../constants';
 import { ResultsDisplay } from './ResultsDisplay';
 import {
   BookIcon,
@@ -38,10 +39,16 @@ export function LibraryPage({
 }: LibraryPageProps) {
   const [query, setQuery] = useState('');
   const [activeTag, setActiveTag] = useState('');
-  const [selectedPage, setSelectedPage] = useState<ScannedPage | null>(null);
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(null);
+  const selectedPage = pages.find(p => p.id === selectedPageId) ?? null;
 
   const tags = useMemo(
     () => Array.from(new Set(pages.flatMap(page => page.tags))).sort(),
+    [pages]
+  );
+
+  const pageHaystacks = useMemo(
+    () => new Map(pages.map(page => [page.id, formatPageAsMarkdown(page).toLowerCase()])),
     [pages]
   );
 
@@ -49,19 +56,15 @@ export function LibraryPage({
     const needle = query.trim().toLowerCase();
     return pages.filter(page => {
       const matchesTag = !activeTag || page.tags.includes(activeTag);
-      const haystack = formatPageAsMarkdown(page).toLowerCase();
-      return matchesTag && (!needle || haystack.includes(needle));
+      return matchesTag && (!needle || pageHaystacks.get(page.id)!.includes(needle));
     });
-  }, [activeTag, pages, query]);
+  }, [activeTag, pages, query, pageHaystacks]);
 
   const totalEntries = pages.reduce((count, page) => count + page.extraction.entries.length, 0);
 
   const handleUpdateSelected = (extraction: OCRExtraction, title: string, tags: string[]) => {
     if (!selectedPage) return;
     onUpdatePage(selectedPage.id, { extraction, title, tags });
-    // Update local state immediately so the modal reflects the change
-    // without waiting for the parent re-render from the store update.
-    setSelectedPage({ ...selectedPage, extraction, title, tags, updatedAt: new Date().toISOString() });
   };
 
   return (
@@ -88,7 +91,7 @@ export function LibraryPage({
           className="library-banner"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+          transition={{ duration: 0.55, ease: ANIM_EASE }}
         >
           <div className="library-banner-copy">
             <span className="eyebrow">Your collection</span>
@@ -105,7 +108,7 @@ export function LibraryPage({
                 className="library-stat"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.1 + i * 0.08, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
+                transition={{ duration: 0.45, delay: 0.1 + i * 0.08, ease: ANIM_EASE }}
               >
                 <strong>{value}</strong>
                 <span>{label}</span>
@@ -144,19 +147,13 @@ export function LibraryPage({
               </button>
             </div>
             <div className="tag-filters" aria-label="Filter by tag">
-              <button
-                className={!activeTag ? 'tag-chip active' : 'tag-chip'}
-                onClick={() => setActiveTag('')}
-              >
-                All
-              </button>
-              {tags.map(tag => (
+              {['', ...tags].map(tag => (
                 <button
-                  key={tag}
-                  className={activeTag === tag ? 'tag-chip active' : 'tag-chip'}
+                  key={tag || '__all__'}
+                  className={`tag-chip${activeTag === tag ? ' active' : ''}`}
                   onClick={() => setActiveTag(tag)}
                 >
-                  {tag}
+                  {tag || 'All'}
                 </button>
               ))}
             </div>
@@ -166,7 +163,7 @@ export function LibraryPage({
             <div className="page-grid">
               {filteredPages.map(page => (
                 <article className="page-card" key={page.id}>
-                  <button className="page-card-main" onClick={() => setSelectedPage(page)}>
+                  <button className="page-card-main" onClick={() => setSelectedPageId(page.id)}>
                     <span className="page-date">{page.extraction.date || 'No date'}</span>
                     <h2>{page.title}</h2>
                     <p>{page.extraction.entries[0]?.text || 'No entries on this page yet.'}</p>
@@ -238,20 +235,21 @@ export function LibraryPage({
           role="dialog"
           aria-modal="true"
           aria-labelledby="page-detail-title"
-          onClick={() => setSelectedPage(null)}
+          onClick={() => setSelectedPageId(null)}
         >
           <div className="modal-content page-detail-modal" onClick={event => event.stopPropagation()}>
             <ResultsDisplay
+              key={selectedPage.id}
               extraction={selectedPage.extraction}
               initialTitle={selectedPage.title}
               initialTags={selectedPage.tags}
               saveLabel="Update Page"
               onSave={handleUpdateSelected}
               onScanAnother={() => {
-                setSelectedPage(null);
+                setSelectedPageId(null);
                 onDigitizeClick();
               }}
-              onDone={() => setSelectedPage(null)}
+              onDone={() => setSelectedPageId(null)}
             />
           </div>
         </div>

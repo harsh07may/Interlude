@@ -44,3 +44,5 @@ export const DEFAULT_OCR_CONFIDENCE = 0.85;
 export const COPY_FEEDBACK_MS = 2000;
 
 export const DEFAULT_PAGE_TITLE = 'Untitled page';
+
+export const ANIM_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];

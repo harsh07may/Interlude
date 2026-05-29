@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useState } from 'react';
 import type { DragEvent } from 'react';
 import { isMobileDevice } from '../lib/utils';
 import { ACCEPTED_MIME_TYPES } from '../constants';
@@ -13,7 +13,7 @@ export function UploadArea({ onImageSelected, isLoading }: UploadAreaProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isDragActive, setIsDragActive] = useState(false);
-  const isMobile = useMemo(() => isMobileDevice(), []);
+  const isMobile = isMobileDevice();
 
   const handleFileChange = async (file: File | null) => {
     if (file) await onImageSelected(file);

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { OCRExtraction, ScannedPage } from '../types';
-import { createId } from '../lib/utils';
+import { addEntryIds, createId } from '../lib/utils';
 import { DEFAULT_PAGE_TITLE, STORAGE_KEY_PAGES } from '../constants';
 
 function normalizePage(page: ScannedPage): ScannedPage {
@@ -8,13 +8,7 @@ function normalizePage(page: ScannedPage): ScannedPage {
     ...page,
     title: page.title.trim() || page.extraction.date || DEFAULT_PAGE_TITLE,
     tags: page.tags.map(tag => tag.trim()).filter(Boolean),
-    extraction: {
-      ...page.extraction,
-      entries: page.extraction.entries.map(entry => ({
-        ...entry,
-        id: entry.id ?? createId(),
-      })),
-    },
+    extraction: addEntryIds(page.extraction),
   };
 }
 
@@ -51,7 +45,11 @@ export function useScannedPages() {
   const [pages, setPages] = useState<ScannedPage[]>(loadStoredPages);
 
   const sortedPages = useMemo(
-    () => [...pages].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt)),
+    () =>
+      pages
+        .map(p => ({ p, t: Date.parse(p.updatedAt) }))
+        .sort((a, b) => b.t - a.t)
+        .map(({ p }) => p),
     [pages]
   );
 

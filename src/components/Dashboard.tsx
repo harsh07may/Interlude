@@ -8,6 +8,7 @@ import {
   Wand2,
 } from "lucide-react";
 import { BookIcon, PenIcon, ScanIcon, SettingsIcon } from "./icons";
+import { ANIM_EASE } from "../constants";
 
 interface DashboardProps {
   onDigitizeClick: () => void;
@@ -15,12 +16,10 @@ interface DashboardProps {
   onSettingsClick: () => void;
 }
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.6, delay, ease: EASE },
+  transition: { duration: 0.6, delay, ease: ANIM_EASE },
 });
 
 const staggerReveal: Variants = {
@@ -28,7 +27,7 @@ const staggerReveal: Variants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, delay: i * 0.12, ease: EASE },
+    transition: { duration: 0.65, delay: i * 0.12, ease: ANIM_EASE },
   }),
 };
 
@@ -146,7 +145,7 @@ export function Dashboard({
             aria-hidden="true"
             initial={reduced ? false : { opacity: 0, scale: 0.94 }}
             animate={reduced ? {} : { opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.35, ease: EASE }}
+            transition={{ duration: 0.7, delay: 0.35, ease: ANIM_EASE }}
           >
             <div className="preview-date">9TH JUNE '26, MONDAY</div>
             {[
@@ -171,7 +170,7 @@ export function Dashboard({
                 transition={{
                   duration: 0.5,
                   delay: 0.55 + i * 0.15,
-                  ease: EASE,
+                  ease: ANIM_EASE,
                 }}
               >
                 <span>{time}</span>
@@ -197,7 +196,7 @@ export function Dashboard({
                 initial={reduced ? false : { opacity: 0, y: 14 }}
                 whileInView={reduced ? {} : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, ease: EASE }}
+                transition={{ duration: 0.5, ease: ANIM_EASE }}
               >
                 The method behind the app
               </motion.span>
@@ -206,7 +205,7 @@ export function Dashboard({
                 initial={reduced ? false : { opacity: 0, y: 22 }}
                 whileInView={reduced ? {} : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.08, ease: EASE }}
+                transition={{ duration: 0.6, delay: 0.08, ease: ANIM_EASE }}
               >
                 Interstitial<br />Journaling
               </motion.h2>
@@ -215,7 +214,7 @@ export function Dashboard({
                 initial={reduced ? false : { opacity: 0, y: 16 }}
                 whileInView={reduced ? {} : { opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.55, delay: 0.2, ease: EASE }}
+                transition={{ duration: 0.55, delay: 0.2, ease: ANIM_EASE }}
               >
                 <p>A practice of writing brief, timestamped notes between every task — capturing not just outcomes, but the honest texture of how your day moved.</p>
                 <p>Popularized by Tony Stubblebine, it turns every transition into a moment of reflection: what you just finished, where you're heading, and whatever's weighing on you in between.</p>
@@ -225,7 +224,7 @@ export function Dashboard({
                 initial={reduced ? false : { opacity: 0, x: -14 }}
                 whileInView={reduced ? {} : { opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.55, delay: 0.32, ease: EASE }}
+                transition={{ duration: 0.55, delay: 0.32, ease: ANIM_EASE }}
               >
                 The goal isn't a perfect record — it's an honest one.
               </motion.blockquote>
@@ -245,7 +244,7 @@ export function Dashboard({
                   initial={reduced ? false : { opacity: 0, x: 20 }}
                   whileInView={reduced ? {} : { opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.45, delay: i * 0.09, ease: EASE }}
+                  transition={{ duration: 0.45, delay: i * 0.09, ease: ANIM_EASE }}
                 >
                   <span className="timeline-time">{time}</span>
                   <div className="timeline-dot" aria-hidden="true" />
@@ -271,7 +270,7 @@ export function Dashboard({
               initial={reduced ? false : { opacity: 0, y: 16 }}
               whileInView={reduced ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, ease: EASE }}
+              transition={{ duration: 0.5, ease: ANIM_EASE }}
             >
               Why Interlude ?
             </motion.span>
@@ -280,7 +279,7 @@ export function Dashboard({
               initial={reduced ? false : { opacity: 0, y: 20 }}
               whileInView={reduced ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.55, delay: 0.08, ease: EASE }}
+              transition={{ duration: 0.55, delay: 0.08, ease: ANIM_EASE }}
             >
               Built around your journal
             </motion.h2>
@@ -323,7 +322,7 @@ export function Dashboard({
               initial={reduced ? false : { opacity: 0, y: 16 }}
               whileInView={reduced ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, ease: EASE }}
+              transition={{ duration: 0.5, ease: ANIM_EASE }}
             >
               How it works ?
             </motion.span>
@@ -332,7 +331,7 @@ export function Dashboard({
               initial={reduced ? false : { opacity: 0, y: 20 }}
               whileInView={reduced ? {} : { opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.55, delay: 0.08, ease: EASE }}
+              transition={{ duration: 0.55, delay: 0.08, ease: ANIM_EASE }}
             >
               Three steps to digital
             </motion.h2>
@@ -369,7 +368,7 @@ export function Dashboard({
           initial={reduced ? false : { opacity: 0, y: 32 }}
           whileInView={reduced ? {} : { opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.65, ease: EASE }}
+          transition={{ duration: 0.65, ease: ANIM_EASE }}
         >
           <p className="cta-eyebrow">Ready to start?</p>
           <h2 className="cta-heading">
